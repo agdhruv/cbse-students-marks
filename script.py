@@ -50,8 +50,8 @@ for rno in range(any_rno-no_of_students,any_rno+no_of_students):
 	}
 	data = {
 		'regno': rollno,
-		'sch': '65629',
-		'cno': '8157',
+		'sch': '65629', # enter school code
+		'cno': '8157', # enter centre code (examination centre)
 		'B2': 'Submit'
 	}
 
