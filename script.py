@@ -3,14 +3,7 @@ from bs4 import BeautifulSoup
 import sys
 import linecache
 
-# url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:9780307592804'
-# response = requests.get(url)
-# data = response.json()
-
-# print response
-# print data
-
-
+# Whenever a the combination of roll number, school code and centre code do not match, an exception will be raised.
 def PrintException():
     exc_type, exc_obj, tb = sys.exc_info()
     f = tb.tb_frame
@@ -26,8 +19,9 @@ any_rno = int(any_rno)
 highest_perc = 0
 lowest_perc = float('inf')
 name = ""
+i = 0
 
-for rno in range(any_rno-200,any_rno+1):
+for rno in range(any_rno-200,any_rno+200):
 	rollno = str(rno)
 	url = 'http://cbseresults.nic.in/class12npy/class12th17.asp'
 	headers = {
@@ -119,7 +113,8 @@ for rno in range(any_rno-200,any_rno+1):
 		result = tableMarks.find("td", attrs={'colspan': '5'}).get_text().strip().encode('utf-8')
 
 		string += "\nPercentage: {}%\n{}\n\n\n\n".format(percentage, result)
-
+		i += 1
+		print i
 		# write in text file
 		with open("results.txt", "a") as file:
 		    file.write(string)
@@ -131,3 +126,4 @@ for rno in range(any_rno-200,any_rno+1):
 
 print "H: " + str(highest_perc)
 print "L: " + str(lowest_perc)
+
