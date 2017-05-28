@@ -13,17 +13,22 @@ def PrintException():
     line = linecache.getline(filename, lineno, f.f_globals)
     print 'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj)
 
-any_rno = '9188280'
+
+no_of_students = 200 # Enter the approximate number of students of class 12 in your school here
+any_rno = '9188280' # Enter any roll number of your school here
 any_rno = int(any_rno)
 
 highest_perc = 0
 lowest_perc = float('inf')
-name = ""
-i = 0
+i = 0 # counter to keep check on how many students' results did we get
 
-for rno in range(any_rno-200,any_rno+200):
+
+# We need to do the same thing for all students of the school. Hence, start loop.
+for rno in range(any_rno-no_of_students,any_rno+no_of_students):
 	rollno = str(rno)
 	url = 'http://cbseresults.nic.in/class12npy/class12th17.asp'
+
+	# Copied headers to from Chrome on Mac to replicate a POST request from a browser.
 	headers = {
 		"Host": "cbseresults.nic.in",
 		"Connection": "keep-alive",
@@ -53,26 +58,27 @@ for rno in range(any_rno-200,any_rno+200):
 	# make Soup :D
 	soup = BeautifulSoup(html, 'lxml')
 
-	# Get name and roll number of student
+	# Get name and roll number of current student in a list.
 	studentDetails = []
+
+	# Here is when the first exception may be raised, since something we are looking for might not
+	# be present in th HTML page if the credentials entered are wrong.
 	try:
 		tableStudent = soup.find("table", attrs={'width': '75%'})
 		for row in tableStudent.find_all("tr")[:2]:
 			detail = row.find_all("td")[1].get_text().strip()
 			studentDetails.append(str(detail))
-		name = studentDetails[0] # temp - remove later
 
 		# Start making string to finally print to text file
 		string = "{}: {}\n".format(studentDetails[0], studentDetails[1])
 
-		# Try to get marks data now
+		# Try to get marks data now - this is where we play the game!
 		total_of_all = 0
 		subs = 0
 		tableMarks = soup.find("table", attrs={'cellpadding': '2'})
 		for row in tableMarks.find_all("tr")[1:-1]:
 			if row.find("td", attrs={"colspan": '6'}):
 				continue
-				print row.find("td", attrs={"colspan": '6'})
 
 			subject = row.find_all("td")[1].get_text().strip().encode('utf-8')
 			theory = row.find_all("td")[2].get_text().strip().encode('utf-8')
@@ -105,25 +111,30 @@ for rno in range(any_rno-200,any_rno+200):
 
 		# Calculate Percentage and result
 		percentage = (total_of_all/subs)
+		result = tableMarks.find("td", attrs={'colspan': '5'}).get_text().strip().encode('utf-8')
 
+		# Calculate highest and lowest percentages
 		if percentage > highest_perc:
 			highest_perc = percentage
 		if percentage < lowest_perc:
 			lowest_perc = percentage
-		result = tableMarks.find("td", attrs={'colspan': '5'}).get_text().strip().encode('utf-8')
 
+		# Complete forming the final string to be written into the text file
 		string += "\nPercentage: {}%\n{}\n\n\n\n".format(percentage, result)
+
+		# print the number of the results that we are getting
 		i += 1
 		print i
+
 		# write in text file
 		with open("results.txt", "a") as file:
 		    file.write(string)
 
 	except Exception as e:
-		PrintException()
-		print "Rno: " + name
+		# PrintException() # this function can be called for debugging
+		print "Invalid credentials."
 		continue
 
-print "H: " + str(highest_perc)
-print "L: " + str(lowest_perc)
+print "\n\nHighest Percentage: " + str(highest_perc)
+print "Lowest Percentage: " + str(lowest_perc)
 
