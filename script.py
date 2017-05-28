@@ -14,12 +14,16 @@ def PrintException():
     print 'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj)
 
 
-no_of_students = 200 # Enter the approximate number of students of class 12 in your school here
+no_of_students = 120 # Enter the approximate number of students of class 12 in your school here
 any_rno = '9188280' # Enter any roll number of your school here
 any_rno = int(any_rno)
 
 highest_perc = 0
 lowest_perc = float('inf')
+marks_in_x = [] # to get the highest score in a subject
+marks_in_x_by = [] # to get the highest scorer(s) in a subject
+highest_in_x = 0
+highest_in_x_by = []
 i = 0 # counter to keep check on how many students' results did we get
 
 
@@ -88,24 +92,26 @@ for rno in range(any_rno-no_of_students,any_rno+no_of_students):
 			total = row.find_all("td")[4].get_text().strip().encode('utf-8')
 			grade = row.find_all("td")[5].get_text().strip().encode('utf-8')
 			if total == "---":
-				subject_pass_fail = "N/A"
 				total = "N/A"
-				string += "{}: {}\n 	{}, {}, {}, {}\n".format(subject, subject_pass_fail, theory, practical, total, grade)
+				string += "{}:\n 	{}, {}, {}, {}\n".format(subject, theory, practical, total, grade)
 				total = "0"
 				subs -= 1
 			elif total[-1:] == "A":
-				subject_pass_fail = "Absent"
 				total = "Absent"
-				string += "{}: {}\n 	{}, {}, {}, {}\n".format(subject, subject_pass_fail, theory, practical, total, grade)
+				string += "{}:\n 	{}, {}, {}, {}\n".format(subject, theory, practical, total, grade)
 				total = "0"
 				subs -= 1
 			else:
-				subject_pass_fail = total[-1:].strip()
 				total = total[0:3]
-				string += "{}: {}\n 	{}, {}, {}, {}\n".format(subject, subject_pass_fail, theory, practical, total, grade)
+				string += "{}:\n 	{}, {}, {}, {}\n".format(subject, theory, practical, total, grade)
 			total = float(total)
 			total_of_all += total
 			subs += 1
+
+			# To get the name and marks of the topper in a subject
+			if subject == 'MATHEMATICS':
+				marks_in_x.append(total)
+				marks_in_x_by.append(studentDetails[1])
 
 		result = tableMarks.find("td", attrs={'colspan': '5'}).get_text()
 
@@ -138,3 +144,8 @@ for rno in range(any_rno-no_of_students,any_rno+no_of_students):
 print "\n\nHighest Percentage: " + str(highest_perc)
 print "Lowest Percentage: " + str(lowest_perc)
 
+highest_in_x = max(marks_in_x)
+for i in range(len(marks_in_x)):
+	if marks_in_x[i] == highest_in_x:
+		highest_in_x_by.append(marks_in_x_by[i])
+print highest_in_x, highest_in_x_by
